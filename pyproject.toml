@@ -1,0 +1,17 @@
+[project]
+name = "mimas"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Ruben Felgenhauer", email = "Ruben.Felgenhauer@posteo.de" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+mimas = "mimas:main"
+
+[build-system]
+requires = ["uv_build>=0.8.15,<0.9.0"]
+build-backend = "uv_build"
