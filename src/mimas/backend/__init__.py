@@ -28,37 +28,11 @@ def make_api_app(interface_impl_class):
         app.add_api_route(path, endpoint=func_impl)
     return app
 
-def walk_dir(p: Path):
-    for dirpath, dirnames, filenames in p.walk():
-        for name in filenames:
-            abs_path = dirpath / name 
-            rel_path = p.stem / abs_path.relative_to(p)
-            if abs_path.suffix == ".py":
-                yield (abs_path, rel_path)
-
-def get_frontend_python_dependencies(frontend_include_paths):
-    yield from mimas.get_frontend_dependencies()
-    for p in frontend_include_paths:
-        p = Path(p)
-        assert p.exists()
-        yield from walk_dir(p)
-
-def make_py_app(frontend_include_paths):
-    static_py_dir = Path.cwd() / "static_py"
-    if static_py_dir.exists():
-        shutil.rmtree(static_py_dir)
-    static_py_dir.mkdir()
-    for (source_path, target_path) in get_frontend_python_dependencies(frontend_include_paths):
-        target_path = static_py_dir / target_path
-        target_path.parent.mkdir(exist_ok=True)
-        shutil.copy(source_path, target_path)
-    return StaticFiles(directory="static_py")
-    
+   
 def make_app(interface_impl_class, frontend_module, frontend_source_paths, frontend_extra_modules):
     app = FastAPI()
     api_app = make_api_app(interface_impl_class)
     app.mount("/api", api_app)
-    app.mount("/static_py", make_py_app(frontend_source_paths), name="static_py")
     app.mount("/mimas", serve_python_code.make_app(frontend_module, frontend_source_paths, frontend_extra_modules), name="mimas")
     app.mount("/", StaticFiles(directory="static", html=True, follow_symlink=True), name="static")
     return app
