@@ -15,7 +15,7 @@ def make_api_client(
     methods = {}
     for route_name in getattr(interface_definition, "_route_definitions", []):
         func_def = interface_definition.__dict__[route_name].__func__
-        path_template = getattr(func_def, "_my_path")
+        path_template = getattr(func_def, "_path")
         sig = inspect.signature(func_def)
 
         def make_method(path_template, sig):

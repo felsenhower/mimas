@@ -6,7 +6,7 @@ Methods = StrEnum("Methods", ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD",
 
 def route(path: str, method: Methods = Methods.GET, url_args: tuple[str] | None = None):
     def decorator(func):
-        func._my_path = path
+        func._path = path
         func._is_route_definition = True
         return staticmethod(abstractmethod(func))
 

@@ -41,7 +41,7 @@ def make_api_app(interface_impl_class: type[T]) -> FastAPI:
     app = FastAPI()
     route_definitions = abc._route_definitions
     for r in route_definitions:
-        path = abc.__dict__[r].__func__._my_path
+        path = abc.__dict__[r].__func__._path
         interface_impl_class_dict = interface_impl_class.__dict__
         static_func = interface_impl_class_dict[r]
         if not hasattr(static_func, "__func__"):
