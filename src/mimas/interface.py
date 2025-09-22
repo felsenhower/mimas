@@ -29,11 +29,25 @@ class InterfaceDefinition(ABC, metaclass=InterfaceDefinitionMeta):
     pass
 
 
-def is_interface_definition_class(cls):
-    # TODO
-    pass
+def require_interface_definition_cls(cls: type):
+    if cls.__bases__ != (InterfaceDefinition,):
+        raise ValueError(
+            f'"{cls}" is not a valid Interface Definition class. Interface Definition classes must directly inherit from InterfaceDefinition and no other base classes.'
+        )
 
 
-def is_interface_implementation_class(cls):
-    # TODO
-    pass
+def require_interface_implementation_cls(cls: type):
+    incorrect_base_class_error_msg = f"{cls} is not a valid Interface Implementation class. Interface Definition classes must directly inherit from an Interface Definition class and no other base classes."
+    if len(cls.__bases__) != 1:
+        raise ValueError(incorrect_base_class_error_msg)
+    base = cls.__base__
+    try:
+        require_interface_definition_cls(base)
+    except ValueError as e:
+        raise ValueError(incorrect_base_class_error_msg) from e
+    try:
+        cls()
+    except TypeError as e:
+        raise ValueError(
+            f'"{cls}" is not a valid Interface Implementation class because it is not constructable.'
+        ) from e

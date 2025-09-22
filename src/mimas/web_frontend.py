@@ -1,17 +1,20 @@
 import inspect
-from mimas.interface import InterfaceDefinition
+from mimas.interface import (
+    InterfaceDefinition,
+    require_interface_definition_cls,
+    require_interface_implementation_cls,
+)
 from pyodide.http import pyfetch
 
 
 def make_api_client(
-    base_class: type[InterfaceDefinition], base_url: str = "http://127.0.0.1:8000/api"
+    interface_definition: type[InterfaceDefinition],
+    base_url: str = "http://127.0.0.1:8000/api",
 ):
-    assert base_class.__bases__ == (InterfaceDefinition,), (
-        'Interface definition class must inherit from "InterfaceDefinition" and no other direct base classes.'
-    )
+    require_interface_definition_cls(interface_definition)
     methods = {}
-    for route_name in getattr(base_class, "_route_definitions", []):
-        func_def = base_class.__dict__[route_name].__func__
+    for route_name in getattr(interface_definition, "_route_definitions", []):
+        func_def = interface_definition.__dict__[route_name].__func__
         path_template = getattr(func_def, "_my_path")
         sig = inspect.signature(func_def)
 
@@ -32,7 +35,6 @@ def make_api_client(
 
         methods[route_name] = make_method(path_template, sig)
     # Create the class with all methods at once
-    Frontend = type("Frontend", (base_class,), methods)
-    # Sanity check: Is the auto-generated class constructable? TODO: Remove this later!
-    Frontend()
+    Frontend = type("Frontend", (interface_definition,), methods)
+    require_interface_implementation_cls(Frontend)
     return Frontend

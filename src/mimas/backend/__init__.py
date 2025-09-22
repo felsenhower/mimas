@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from mimas.interface import InterfaceDefinition
+from mimas.interface import InterfaceDefinition, require_interface_implementation_cls
 from mimas.backend import serve_python_code
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
@@ -36,15 +36,8 @@ def make_api_app(interface_impl_class: type[T]) -> FastAPI:
     Returns:
         FastAPI: The generated FastAPI app.
     """
-    # Is the provided class constructable? TODO: There's probably a more elegant way to do this...
-    interface_impl_class()
-    assert len(interface_impl_class.__bases__) == 1, (
-        "Interface implementation class must inherit from exactly one base class."
-    )
+    require_interface_implementation_cls(interface_impl_class)
     abc = interface_impl_class.__base__
-    assert abc.__bases__ == (InterfaceDefinition,), (
-        'Interface definition class must inherit from "InterfaceDefinition" and no other direct base classes.'
-    )
     app = FastAPI()
     route_definitions = abc._route_definitions
     for r in route_definitions:
