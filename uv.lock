@@ -284,12 +284,14 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi", extra = ["standard"] },
+    { name = "jinja2" },
     { name = "pydantic" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = ">=0.116.2" },
+    { name = "jinja2", specifier = ">=3.1.6" },
     { name = "pydantic", specifier = "==2.10.6" },
 ]
 
