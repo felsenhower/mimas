@@ -8,6 +8,7 @@ from mimas.backend import serve_python_code
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from markupsafe import Markup
+from importlib import resources
 
 def route_impl(func):
     return staticmethod(func)
@@ -30,14 +31,11 @@ def make_api_app(interface_impl_class):
         app.add_api_route(path, endpoint=func_impl)
     return app
 
-SETUP_JS_CODE = Markup("""
-<script src="https://cdn.jsdelivr.net/pyodide/v0.28.2/full/pyodide.js"></script>
-<script src="mimas/init.js" defer></script> 
-""")
+SETUP_HTML_CODE = Markup(resources.files("mimas").joinpath("data/setup_snippet.html").read_text())
 
-SETUP_JS_HOOK = "setup_mimas"
+SETUP_HTML_HOOK = "setup_mimas"
 
-TEMPLATE_CONTEXT = {SETUP_JS_HOOK: SETUP_JS_CODE}
+TEMPLATE_CONTEXT = {SETUP_HTML_HOOK: SETUP_HTML_CODE}
 
 def make_app(interface_impl_class, frontend_module, frontend_source_paths, frontend_extra_modules):
     app = FastAPI()
