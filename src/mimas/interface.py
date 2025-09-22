@@ -10,10 +10,7 @@ def route(path: str, method: str, url_args: tuple[str] | None = None):
             "POST",
             "PUT",
             "DELETE",
-            "OPTIONS",
-            "HEAD",
             "PATCH",
-            "TRACE",
         }
         func._method = method
         return staticmethod(abstractmethod(func))
@@ -37,20 +34,8 @@ def delete(path: str, url_args: tuple[str] | None = None):
     return route(path, "DELETE", url_args)
 
 
-def options(path: str, url_args: tuple[str] | None = None):
-    return route(path, "OPTIONS", url_args)
-
-
-def head(path: str, url_args: tuple[str] | None = None):
-    return route(path, "HEAD", url_args)
-
-
 def patch(path: str, url_args: tuple[str] | None = None):
     return route(path, "PATCH", url_args)
-
-
-def trace(path: str, url_args: tuple[str] | None = None):
-    return route(path, "TRACE", url_args)
 
 
 class InterfaceDefinitionMeta(ABCMeta):
