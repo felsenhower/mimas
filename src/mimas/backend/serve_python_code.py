@@ -93,10 +93,14 @@ def make_app(
         get_frontend_python_dependencies(frontend_source_paths)
     )
 
+    frontend_extra_modules = list(frontend_extra_modules or [])
+    if "pydantic" not in frontend_extra_modules:
+        frontend_extra_modules.append("pydantic")
+
     overview = Overview(
         frontend_module=frontend_module,
         frontend_source_paths=[str(p) for p in frontend_python_dependencies.keys()],
-        frontend_extra_modules=list(frontend_extra_modules or []),
+        frontend_extra_modules=frontend_extra_modules,
     )
 
     app.add_api_route("/", endpoint=lambda: overview)
