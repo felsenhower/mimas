@@ -3,7 +3,9 @@ from mimas.interface import InterfaceDefinition
 from pyodide.http import pyfetch
 
 
-def make_api_client(base_class, base_url="http://127.0.0.1:8000/api"):
+def make_api_client(
+    base_class: type[InterfaceDefinition], base_url: str = "http://127.0.0.1:8000/api"
+):
     assert base_class.__bases__ == (InterfaceDefinition,), (
         'Interface definition class must inherit from "InterfaceDefinition" and no other direct base classes.'
     )
