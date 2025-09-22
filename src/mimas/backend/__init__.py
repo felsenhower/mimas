@@ -10,15 +10,21 @@ from fastapi.responses import HTMLResponse
 from markupsafe import Markup
 from importlib import resources
 
+
 def route_impl(func):
     return staticmethod(func)
+
 
 def make_api_app(interface_impl_class):
     # Is the provided class constructable? TODO: There's probably a more elegant way to do this...
     interface_impl_class()
-    assert (len(interface_impl_class.__bases__) == 1), ("Interface implementation class must inherit from exactly one base class.")
+    assert len(interface_impl_class.__bases__) == 1, (
+        "Interface implementation class must inherit from exactly one base class."
+    )
     abc = interface_impl_class.__base__
-    assert (abc.__bases__ == (InterfaceDefinition,)), ("Interface definition class must inherit from \"InterfaceDefinition\" and no other direct base classes.")
+    assert abc.__bases__ == (InterfaceDefinition,), (
+        'Interface definition class must inherit from "InterfaceDefinition" and no other direct base classes.'
+    )
     app = FastAPI()
     route_definitions = abc._route_definitions
     for r in route_definitions:
@@ -26,29 +32,45 @@ def make_api_app(interface_impl_class):
         interface_impl_class_dict = interface_impl_class.__dict__
         static_func = interface_impl_class_dict[r]
         if not hasattr(static_func, "__func__"):
-            raise Exception(f"Unable to obtain function object for function \"{r}\". Perhaps you forgot a \"@route_impl\"?")
+            raise Exception(
+                f'Unable to obtain function object for function "{r}". Perhaps you forgot a "@route_impl"?'
+            )
         func_impl = static_func.__func__
         app.add_api_route(path, endpoint=func_impl)
     return app
 
-SETUP_HTML_CODE = Markup(resources.files("mimas").joinpath("data/setup_snippet.html").read_text())
+
+SETUP_HTML_CODE = Markup(
+    resources.files("mimas").joinpath("data/setup_snippet.html").read_text()
+)
 
 SETUP_HTML_HOOK = "setup_mimas"
 
 TEMPLATE_CONTEXT = {SETUP_HTML_HOOK: SETUP_HTML_CODE}
 
-def make_app(interface_impl_class, frontend_module, frontend_source_paths, frontend_extra_modules):
+
+def make_app(
+    interface_impl_class, frontend_module, frontend_source_paths, frontend_extra_modules
+):
     app = FastAPI()
-    
+
     api_app = make_api_app(interface_impl_class)
-    
+
     app.mount("/api", api_app)
-    app.mount("/mimas", serve_python_code.make_app(frontend_module, frontend_source_paths, frontend_extra_modules), name="mimas")
+    app.mount(
+        "/mimas",
+        serve_python_code.make_app(
+            frontend_module, frontend_source_paths, frontend_extra_modules
+        ),
+        name="mimas",
+    )
 
     templates = Jinja2Templates(directory="templates")
+
     @app.get("/", response_class=HTMLResponse)
     async def index(request: Request):
         return templates.TemplateResponse(
             request=request, name="index.html", context=TEMPLATE_CONTEXT
         )
+
     return app

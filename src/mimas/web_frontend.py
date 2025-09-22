@@ -2,8 +2,11 @@ import inspect
 from mimas.interface import InterfaceDefinition
 from pyodide.http import pyfetch
 
+
 def make_api_client(base_class, base_url="http://127.0.0.1:8000/api"):
-    assert (base_class.__bases__ == (InterfaceDefinition,)), ("Interface definition class must inherit from \"InterfaceDefinition\" and no other direct base classes.")
+    assert base_class.__bases__ == (InterfaceDefinition,), (
+        'Interface definition class must inherit from "InterfaceDefinition" and no other direct base classes.'
+    )
     methods = {}
     for route_name in getattr(base_class, "_route_definitions", []):
         func_def = base_class.__dict__[route_name].__func__
@@ -22,6 +25,7 @@ def make_api_client(base_class, base_url="http://127.0.0.1:8000/api"):
                 r = await pyfetch(url)
                 r.raise_for_status()
                 return await r.json()
+
             return staticmethod(method)
 
         methods[route_name] = make_method(path_template, sig)
