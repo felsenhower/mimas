@@ -5,6 +5,7 @@ from mimas.interface import (
     require_interface_implementation_cls,
 )
 from pyodide.http import pyfetch
+from pydantic import BaseModel
 
 
 def make_api_client(
@@ -29,12 +30,16 @@ def make_api_client(
                 url = f"{base_url}{full_path}"
                 r = await pyfetch(url, method=http_method)
                 r.raise_for_status()
-                return await r.json()
+                json = await r.json()
+                if isinstance(sig.return_annotation, type) and issubclass(
+                    sig.return_annotation, BaseModel
+                ):
+                    return sig.return_annotation.model_validate(json)
+                return json
 
             return staticmethod(method)
 
         methods[route_name] = make_method(path_template, sig, http_method)
-    # Create the class with all methods at once
     Frontend = type("Frontend", (interface_definition,), methods)
     require_interface_implementation_cls(Frontend)
     return Frontend
