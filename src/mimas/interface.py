@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod, ABCMeta
 
+from enum import StrEnum
 
-def route(path: str, url_args: tuple[str] | None = None):
+Methods = StrEnum("Methods", ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH", "TRACE"])
+
+def route(path: str, method: Methods = Methods.GET, url_args: tuple[str] | None = None):
     def decorator(func):
         func._my_path = path
         func._is_route_definition = True
