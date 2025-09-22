@@ -16,9 +16,10 @@ def make_api_client(
     for route_name in getattr(interface_definition, "_route_definitions", []):
         func_def = interface_definition.__dict__[route_name].__func__
         path_template = getattr(func_def, "_path")
+        http_method = getattr(func_def, "_method")
         sig = inspect.signature(func_def)
 
-        def make_method(path_template, sig):
+        def make_method(path_template, sig, http_method):
             def method(*args, **kwargs):
                 bound = sig.bind(*args, **kwargs)
                 bound.apply_defaults()
@@ -26,13 +27,13 @@ def make_api_client(
                 for k, v in bound.arguments.items():
                     full_path = full_path.replace(f"{{{k}}}", str(v))
                 url = f"{base_url}{full_path}"
-                r = requests.get(url)
+                r = requests.request(method=http_method, url=url)
                 r.raise_for_status()
                 return r.json()
 
             return staticmethod(method)
 
-        methods[route_name] = make_method(path_template, sig)
+        methods[route_name] = make_method(path_template, sig, http_method)
     # Create the class with all methods at once
     Frontend = type("Frontend", (interface_definition,), methods)
     require_interface_implementation_cls(Frontend)
