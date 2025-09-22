@@ -1,11 +1,13 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 import mimas
 from mimas.interface import InterfaceDefinition
 from pathlib import Path
 import shutil
 from mimas.backend import serve_python_code
-
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
+from markupsafe import Markup
 
 def route_impl(func):
     return staticmethod(func)
@@ -28,11 +30,27 @@ def make_api_app(interface_impl_class):
         app.add_api_route(path, endpoint=func_impl)
     return app
 
-   
+SETUP_JS_CODE = Markup("""
+<script src="https://cdn.jsdelivr.net/pyodide/v0.28.2/full/pyodide.js"></script>
+<script src="mimas/init.js" defer></script> 
+""")
+
+SETUP_JS_HOOK = "setup_mimas"
+
+TEMPLATE_CONTEXT = {SETUP_JS_HOOK: SETUP_JS_CODE}
+
 def make_app(interface_impl_class, frontend_module, frontend_source_paths, frontend_extra_modules):
     app = FastAPI()
+    
     api_app = make_api_app(interface_impl_class)
+    
     app.mount("/api", api_app)
     app.mount("/mimas", serve_python_code.make_app(frontend_module, frontend_source_paths, frontend_extra_modules), name="mimas")
-    app.mount("/", StaticFiles(directory="static", html=True, follow_symlink=True), name="static")
+
+    templates = Jinja2Templates(directory="templates")
+    @app.get("/", response_class=HTMLResponse)
+    async def index(request: Request):
+        return templates.TemplateResponse(
+            request=request, name="index.html", context=TEMPLATE_CONTEXT
+        )
     return app

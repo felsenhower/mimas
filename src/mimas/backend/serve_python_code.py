@@ -24,7 +24,7 @@ class Overview(BaseModel):
     frontend_source_paths: list[str]
     frontend_extra_modules: list[str]
 
-init_js_code = """
+INIT_JS_CODE = """
 async function init_mimas() {
     const pyodide = await loadPyodide();
     async function get_overview() {
@@ -61,7 +61,7 @@ def make_app(frontend_module: str, frontend_source_paths, frontend_extra_modules
     
     app.add_api_route("/", endpoint=lambda: overview)
     
-    app.add_api_route("/init.js", endpoint=lambda: Response(content=init_js_code, media_type="text/javascript"))
+    app.add_api_route("/init.js", endpoint=lambda: Response(content=INIT_JS_CODE, media_type="text/javascript"))
     
     file_locations = {
         str(target_path): source_path for (source_path, target_path) in get_frontend_python_dependencies(frontend_source_paths)
