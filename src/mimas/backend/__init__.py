@@ -4,6 +4,8 @@ import mimas
 from mimas.interface import InterfaceDefinition
 from pathlib import Path
 import shutil
+from mimas.backend import serve_python_code
+
 
 def route_impl(func):
     return staticmethod(func)
@@ -52,10 +54,11 @@ def make_py_app(frontend_include_paths):
         shutil.copy(source_path, target_path)
     return StaticFiles(directory="static_py")
     
-def make_app(interface_impl_class, frontend_include_paths):
+def make_app(interface_impl_class, frontend_module, frontend_source_paths, frontend_extra_modules):
     app = FastAPI()
     api_app = make_api_app(interface_impl_class)
     app.mount("/api", api_app)
-    app.mount("/static_py", make_py_app(frontend_include_paths), name="static_py")
+    app.mount("/static_py", make_py_app(frontend_source_paths), name="static_py")
+    app.mount("/mimas", serve_python_code.make_app(frontend_module, frontend_source_paths, frontend_extra_modules), name="mimas")
     app.mount("/", StaticFiles(directory="static", html=True, follow_symlink=True), name="static")
     return app
