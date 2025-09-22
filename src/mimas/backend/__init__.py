@@ -1,9 +1,5 @@
 from fastapi import FastAPI, Request
-from fastapi.staticfiles import StaticFiles
-import mimas
 from mimas.interface import InterfaceDefinition
-from pathlib import Path
-import shutil
 from mimas.backend import serve_python_code
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
