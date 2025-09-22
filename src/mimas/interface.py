@@ -1,13 +1,21 @@
 from abc import ABC, abstractmethod, ABCMeta
 
-from enum import StrEnum
 
-Methods = StrEnum("Methods", ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH", "TRACE"])
-
-def route(path: str, method: Methods = Methods.GET, url_args: tuple[str] | None = None):
+def route(path: str, method: str, url_args: tuple[str] | None = None):
     def decorator(func):
         func._path = path
         func._is_route_definition = True
+        assert method in {
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE",
+            "OPTIONS",
+            "HEAD",
+            "PATCH",
+            "TRACE",
+        }
+        func._method = method
         return staticmethod(abstractmethod(func))
 
     return decorator

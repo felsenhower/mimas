@@ -42,6 +42,7 @@ def make_api_app(interface_impl_class: type[T]) -> FastAPI:
     route_definitions = abc._route_definitions
     for r in route_definitions:
         path = abc.__dict__[r].__func__._path
+        method = abc.__dict__[r].__func__._method
         interface_impl_class_dict = interface_impl_class.__dict__
         static_func = interface_impl_class_dict[r]
         if not hasattr(static_func, "__func__"):
@@ -49,7 +50,7 @@ def make_api_app(interface_impl_class: type[T]) -> FastAPI:
                 f'Unable to obtain function object for function "{r}". Perhaps you forgot a "@route_impl"?'
             )
         func_impl = static_func.__func__
-        app.add_api_route(path, endpoint=func_impl)
+        app.add_api_route(path, endpoint=func_impl, methods=[method])
     return app
 
 
