@@ -21,6 +21,38 @@ def route(path: str, method: str, url_args: tuple[str] | None = None):
     return decorator
 
 
+def get(path: str, url_args: tuple[str] | None = None):
+    return route(path, "GET", url_args)
+
+
+def post(path: str, url_args: tuple[str] | None = None):
+    return route(path, "POST", url_args)
+
+
+def put(path: str, url_args: tuple[str] | None = None):
+    return route(path, "PUT", url_args)
+
+
+def delete(path: str, url_args: tuple[str] | None = None):
+    return route(path, "DELETE", url_args)
+
+
+def options(path: str, url_args: tuple[str] | None = None):
+    return route(path, "OPTIONS", url_args)
+
+
+def head(path: str, url_args: tuple[str] | None = None):
+    return route(path, "HEAD", url_args)
+
+
+def patch(path: str, url_args: tuple[str] | None = None):
+    return route(path, "PATCH", url_args)
+
+
+def trace(path: str, url_args: tuple[str] | None = None):
+    return route(path, "TRACE", url_args)
+
+
 class InterfaceDefinitionMeta(ABCMeta):
     def __new__(cls, name, bases, dct):
         cls_obj = super().__new__(cls, name, bases, dct)
