@@ -1,7 +1,12 @@
 from abc import ABC, abstractmethod, ABCMeta
 
 
-def route(path: str, method: str, url_args: tuple[str] | None = None):
+def route(
+    path: str,
+    method: str,
+    url_args: tuple[str] | None = None,
+    has_request_data: bool = False,
+):
     def decorator(func):
         func._path = path
         func._is_route_definition = True
@@ -12,6 +17,8 @@ def route(path: str, method: str, url_args: tuple[str] | None = None):
             "DELETE",
             "PATCH",
         }
+        if method in {"GET", "DELETE"}:
+            assert has_request_data == False
         func._method = method
         return staticmethod(abstractmethod(func))
 
@@ -19,23 +26,31 @@ def route(path: str, method: str, url_args: tuple[str] | None = None):
 
 
 def get(path: str, url_args: tuple[str] | None = None):
-    return route(path, "GET", url_args)
+    return route(path=path, method="GET", url_args=url_args, has_request_data=False)
 
 
-def post(path: str, url_args: tuple[str] | None = None):
-    return route(path, "POST", url_args)
+def post(path: str, url_args: tuple[str] | None = None, has_request_data: bool = False):
+    return route(
+        path=path, method="POST", url_args=url_args, has_request_data=has_request_data
+    )
 
 
-def put(path: str, url_args: tuple[str] | None = None):
-    return route(path, "PUT", url_args)
+def put(path: str, url_args: tuple[str] | None = None, has_request_data: bool = False):
+    return route(
+        path=path, method="PUT", url_args=url_args, has_request_data=has_request_data
+    )
 
 
 def delete(path: str, url_args: tuple[str] | None = None):
-    return route(path, "DELETE", url_args)
+    return route(path=path, method="DELETE", url_args=url_args, has_request_data=False)
 
 
-def patch(path: str, url_args: tuple[str] | None = None):
-    return route(path, "PATCH", url_args)
+def patch(
+    path: str, url_args: tuple[str] | None = None, has_request_data: bool = False
+):
+    return route(
+        path=path, method="PATCH", url_args=url_args, has_request_data=has_request_data
+    )
 
 
 class InterfaceDefinitionMeta(ABCMeta):
