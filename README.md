@@ -4,7 +4,7 @@ Mimas[^1] is a simple[^2] full-stack web framework built on [**FastAPI**](https:
 
 At its current state, **Mimas should absolutely not be used in production** for various reasons. I just thought it would be a nice academic exercise.
 
-If you like FastAPI and handcraft your HTML, CSS, and JS, [getting started with Mimas](#todo) will be pretty easy for you.
+If you like FastAPI and handcraft your HTML, CSS, and JS, [getting started with Mimas](https://github.com/felsenhower/mimas/wiki/Getting-Started) will be pretty easy for you.
 
 [^1]: /ˈmíː.mas/ or /ˈmaɪməs/, named after the seventh-largest moon of Saturn which is itself named after a giant from Greek mythology, *Μίμας*. It also means something in Spanish and Latin, but I didn't know that when naming this project.
 
